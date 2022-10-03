@@ -88,7 +88,11 @@ const addEmployee = () => {
 
 const viewEmployees = () => {
     db.query(
-        `SELECT * FROM employees`,
+        `SELECT employees.*, roles.title
+        AS role_title
+        FROM employees
+        LEFT JOIN roles
+        ON employees.role_id = roles.id`,
         function(err, results, fields) {
             console.table(results);
             startApp()
@@ -108,12 +112,20 @@ const viewDepartments = () => {
 
 const viewRoles = () =>{
     db.query(
-        `SELECT * FROM roles;`,
+        `SELECT roles.*, departments.dept_name
+        AS department_name
+        FROM roles
+        LEFT JOIN departments
+        ON roles.department_id = departments.id`,
         function(err, results, fields){
             console.table(results);
             startApp()
         }
     )
+};
+
+const updateEmployee = () => {
+    startApp()
 };
 
 const startApp = () => {
@@ -134,6 +146,8 @@ const startApp = () => {
             viewRoles();
         } else if (response.start === 'View all departments') {
             viewDepartments();
+        } else if (response.start === 'Update an employee role') {
+            updateEmployee();
         }
     });
 };

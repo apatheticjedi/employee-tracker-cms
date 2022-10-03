@@ -1,7 +1,7 @@
 // const express = require('express');
 // const router = express.Router();
 const inquirer = require('inquirer');
-const db = require('../db/connection')
+const db = require('../db/connection');
 
 const introQuestion = [
     {
@@ -22,17 +22,17 @@ const employeeQuestions = [
         type: 'input',
         name: 'lastName',
         message: "What is the employee's last name?"
-    },
-    {
-        type: 'input',
-        name: 'employeeRole',
-        message: "What is the employee's role?"
-    }, 
-    {
-        type: 'input',
-        name: 'manager',
-        message: "Who is the employee's manager?"
     }
+    // {
+    //     type: 'input',
+    //     name: 'employeeRole',
+    //     message: "What is the employee's role?"
+    // }, 
+    // {
+    //     type: 'input',
+    //     name: 'manager',
+    //     message: "Who is the employee's manager?"
+    // }
 ];
 
 const departmentQuestion = [
@@ -70,8 +70,50 @@ const addDept = () => {
     inquirer.prompt(departmentQuestion);
 };
 
+const employeeRole = () => {
+    return this.query(
+        `SELECT * FROM roles;`
+    );
+}
+
 const addEmployee = () => {
-    inquirer.prompt(employeeQuestions);
+    inquirer.prompt(employeeQuestions)
+    .then(data => {
+        let firstName = data.firstName;
+        let lastName = data.lastName;
+        console.table(employeeRole());
+
+    });
+};
+
+const viewEmployees = () => {
+    db.query(
+        `SELECT * FROM employees`,
+        function(err, results, fields) {
+            console.table(results);
+            startApp()
+        }
+    )
+};
+
+const viewDepartments = () => {
+    db.query(
+        `SELECT * FROM departments`,
+        function(err, results, fields){
+            console.table(results);
+            startApp()
+        }
+    )
+};
+
+const viewRoles = () =>{
+    db.query(
+        `SELECT * FROM roles;`,
+        function(err, results, fields){
+            console.table(results);
+            startApp()
+        }
+    )
 };
 
 const startApp = () => {
@@ -86,6 +128,12 @@ const startApp = () => {
             addEmployee();
         } else if (response.start === 'Add a role') {
             addRole();
+        } else if (response.start === 'View all employees') {
+            viewEmployees();
+        } else if (response.start === 'View all roles') {
+            viewRoles();
+        } else if (response.start === 'View all departments') {
+            viewDepartments();
         }
     });
 };

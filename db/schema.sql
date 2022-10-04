@@ -4,7 +4,8 @@ DROP TABLE IF EXISTS employees;
 
 CREATE TABLE departments(
     id INT AUTO_INCREMENT PRIMARY KEY,
-    dept_name VARCHAR(30) NOT NULL
+    dept_name VARCHAR(30) NOT NULL,
+    CONSTRAINT UC_department UNIQUE (dept_name)
 );
 
 CREATE TABLE roles(
@@ -12,7 +13,6 @@ CREATE TABLE roles(
     title VARCHAR(30) NOT NULL,
     salary DECIMAL(8,2),
     department_id INT,
-    -- INDEX department_index (department_id),
     CONSTRAINT fk_department FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE SET NULL
 );
 

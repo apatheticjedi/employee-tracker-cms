@@ -1,7 +1,8 @@
-// const express = require('express');
-// const router = express.Router();
 const inquirer = require('inquirer');
 const db = require('../db/connection');
+
+let roles = ['Sales Lead', 'Salesperson', 'Lead Engineer', 'Software Engineer', 'Account Manager', 'Accountant', 'Legal Team Lead', 'Lawyer'];
+let departments = ['Sales', 'Engineering', 'Finance', 'Legal'];
 
 const introQuestion = [
     {
@@ -17,17 +18,18 @@ const employeeQuestions = [
         type: 'input',
         name: 'firstName',
         message: "What is the employee's first name?",
-    }, 
+    },
     {
         type: 'input',
         name: 'lastName',
         message: "What is the employee's last name?"
+    },
+    {
+        type: 'list',
+        name: 'employeeRole',
+        message: "What is the employee's role?",
+        choices: roles
     }
-    // {
-    //     type: 'input',
-    //     name: 'employeeRole',
-    //     message: "What is the employee's role?"
-    // }, 
     // {
     //     type: 'input',
     //     name: 'manager',
@@ -58,98 +60,124 @@ const roleQuestions = [
         type: 'list',
         name: 'roleDept',
         message: 'Which department does the role belong to?',
-        choices: ['']
+        choices: departments
     }
 ];
 
+// const getDepartments = () => {
+//     const sql = `SELECT dept_name FROM departments`;
+//     db.query(sql, (err, rows) => {
+//         console.log(rows);
+//     });
+// };
+
+// const getRoles = () => {
+//     db.query(
+//         `SELECT title FROM roles`,
+//         function (err, results, fields) {
+//             roles.push(results);
+//         });
+// };
+
 const addRole = () => {
-    inquirer.prompt(roleQuestions);
+    inquirer.prompt(roleQuestions)
+        .then(data => {
+            let role = data.role;
+            let salary = data.salary;
+            let dept = data.roleDept;
+            const sql = `INSERT INTO roles (title, salary, department_id) 
+            VALUES ('${role}', ${salary}, ${dept})`;
+            db.query(sql, (err, rows) => {
+                startApp();
+            });
+        });
 };
 
 const addDept = () => {
-    inquirer.prompt(departmentQuestion);
+    inquirer.prompt(departmentQuestion)
+        .then(data => {
+            const sql = `INSERT INTO departments (dept_name) VALUES ('${data.department}')`;
+            if (!data.department) {
+                console.log('Add a department.');
+                addDept();
+            } else {
+                db.query(sql, (err, rows) => {
+                    console.log('Department added.');
+                    startApp();
+                });
+            }
+        });
 };
-
-const employeeRole = () => {
-    return this.query(
-        `SELECT * FROM roles;`
-    );
-}
 
 const addEmployee = () => {
     inquirer.prompt(employeeQuestions)
-    .then(data => {
-        let firstName = data.firstName;
-        let lastName = data.lastName;
-        console.table(employeeRole());
+        .then(data => {
+            let firstName = data.firstName;
+            let lastName = data.lastName;
+            console.table(employeeRole());
 
-    });
+        });
 };
 
 const viewEmployees = () => {
-    db.query(
-        `SELECT employees.*, roles.title
+    const sql = `SELECT employees.*, roles.title
         AS role_title
         FROM employees
         LEFT JOIN roles
-        ON employees.role_id = roles.id`,
-        function(err, results, fields) {
-            console.table(results);
-            startApp()
-        }
-    )
+        ON employees.role_id = roles.id`;
+    db.query(sql, (err, rows) => {
+        console.table(rows);
+        startApp();
+    });
 };
 
 const viewDepartments = () => {
-    db.query(
-        `SELECT * FROM departments`,
-        function(err, results, fields){
-            console.table(results);
-            startApp()
-        }
-    )
+    const sql = `SELECT * FROM departments`;
+    db.query(sql, (err, rows) => {
+        console.table(rows);
+        startApp();
+    });
 };
 
-const viewRoles = () =>{
-    db.query(
-        `SELECT roles.*, departments.dept_name
+const viewRoles = () => {
+    const sql = `SELECT roles.*, departments.dept_name
         AS department_name
         FROM roles
         LEFT JOIN departments
-        ON roles.department_id = departments.id`,
-        function(err, results, fields){
-            console.table(results);
-            startApp()
-        }
-    )
+        ON roles.department_id = departments.id`;
+    db.query(sql, (err, rows) => {
+        console.table(rows);
+        startApp();
+    });
 };
 
 const updateEmployee = () => {
-    startApp()
+    const sql = `UPDATE employees SET role_id = ? WHERE id = ?`
+    startApp();
 };
 
 const startApp = () => {
     inquirer.prompt(introQuestion)
-    .then((response) => {
-        if (response.start === 'Quit') {
-            console.log('goodbye');
-            db.end();
-        } else if (response.start === 'Add a department') {
-            addDept();
-        } else if (response.start === 'Add an employee') {
-            addEmployee();
-        } else if (response.start === 'Add a role') {
-            addRole();
-        } else if (response.start === 'View all employees') {
-            viewEmployees();
-        } else if (response.start === 'View all roles') {
-            viewRoles();
-        } else if (response.start === 'View all departments') {
-            viewDepartments();
-        } else if (response.start === 'Update an employee role') {
-            updateEmployee();
-        }
-    });
+        .then((response) => {
+            if (response.start === 'Quit') {
+                console.log('goodbye');
+                db.end();
+            } else if (response.start === 'Add a department') {
+                addDept();
+            } else if (response.start === 'Add an employee') {
+                addEmployee();
+            } else if (response.start === 'Add a role') {
+                addRole();
+            } else if (response.start === 'View all employees') {
+                viewEmployees();
+            } else if (response.start === 'View all roles') {
+                viewRoles();
+            } else if (response.start === 'View all departments') {
+                viewDepartments();
+            } else if (response.start === 'Update an employee role') {
+                updateEmployee();
+            }
+        });
 };
 
 module.exports = startApp;

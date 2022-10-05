@@ -3,6 +3,7 @@ const db = require('../db/connection');
 
 let roles = ['Sales Lead', 'Salesperson', 'Lead Engineer', 'Software Engineer', 'Account Manager', 'Accountant', 'Legal Team Lead', 'Lawyer'];
 let departments = ['Sales', 'Engineering', 'Finance', 'Legal'];
+let employees = ['Mark Hamill', 'Harrison Ford', 'Carrie Fisher', 'James Earl Jones', 'Anthony Daniels', 'Peter Cushing', 'Peter Mayhew', 'Alec Guinness']
 
 const introQuestion = [
     {
@@ -29,12 +30,13 @@ const employeeQuestions = [
         name: 'employeeRole',
         message: "What is the employee's role?",
         choices: roles
+    },
+    {
+        type: 'list',
+        name: 'manager',
+        message: "Who is the employee's manager?",
+        choices: employees
     }
-    // {
-    //     type: 'input',
-    //     name: 'manager',
-    //     message: "Who is the employee's manager?"
-    // }
 ];
 
 const departmentQuestion = [
@@ -64,6 +66,21 @@ const roleQuestions = [
     }
 ];
 
+const employeeUpdate = [
+    {
+        type: 'list',
+        name: 'update',
+        message: 'Which employee would you like to update?',
+        choices: employees
+    },
+    {
+        type: 'list',
+        name: 'newRole',
+        message: "What is the employee's new role?",
+        choices: roles
+    }
+]
+
 // const getDepartments = () => {
 //     const sql = `SELECT dept_name FROM departments`;
 //     db.query(sql, (err, rows) => {
@@ -75,7 +92,6 @@ const roleQuestions = [
 //     db.query(
 //         `SELECT title FROM roles`,
 //         function (err, results, fields) {
-//             roles.push(results);
 //         });
 // };
 
@@ -114,6 +130,8 @@ const addEmployee = () => {
         .then(data => {
             let firstName = data.firstName;
             let lastName = data.lastName;
+            const sql = `INSERT INTO employees (first_name, last_name, role_id, manager_id)
+            VALUES ('${firstName}', '${lastName}', '')`
             console.table(employeeRole());
 
         });
@@ -152,7 +170,14 @@ const viewRoles = () => {
 };
 
 const updateEmployee = () => {
-    const sql = `UPDATE employees SET role_id = ? WHERE id = ?`
+    inquirer.prompt(employeeUpdate)
+        .then(data => {
+            let employee = data.update;
+            let role = data.newRole
+            const sql = `UPDATE employees SET role_id = ${role} WHERE id = ${employee}`;
+            db.query(sql, (err, rows) => {
+            });
+        });
     startApp();
 };
 

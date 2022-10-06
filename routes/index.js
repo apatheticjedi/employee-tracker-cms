@@ -81,6 +81,7 @@ const employeeUpdate = [
     }
 ]
 
+// add a role
 const addRole = async () => {
     inquirer.prompt(roleQuestions)
         .then(answer => {
@@ -107,7 +108,7 @@ const addRole = async () => {
         });
 };
 
-
+// add a department
 const addDept = () => {
     inquirer.prompt(departmentQuestion)
         .then(data => {
@@ -124,6 +125,7 @@ const addDept = () => {
         });
 };
 
+// add an employee, creating role id based on role provided
 const addEmployee = async () => {
     inquirer.prompt(employeeQuestions)
         .then(data => {
@@ -159,6 +161,7 @@ const addEmployee = async () => {
         });
 };
 
+// view all employees
 const viewEmployees = () => {
     const sql = `SELECT employees.*, roles.title
         AS role_title
@@ -171,6 +174,7 @@ const viewEmployees = () => {
     });
 };
 
+// view all departments
 const viewDepartments = () => {
     const sql = `SELECT * FROM departments`;
     db.query(sql, (err, rows) => {
@@ -179,6 +183,7 @@ const viewDepartments = () => {
     });
 };
 
+// view all roles 
 const viewRoles = () => {
     const sql = `SELECT roles.*, departments.dept_name
         AS department_name
@@ -203,6 +208,7 @@ const updateEmployee = () => {
     startApp();
 };
 
+// initialize application and ask intro questions
 const startApp = () => {
     inquirer.prompt(introQuestion)
         .then((response) => {

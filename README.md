@@ -38,6 +38,8 @@ in the command line to download  Inquirer, MySQL2, console.table, and dotenv npm
 
 ## Usage
 
+[Walkthrough VIdeo](https://youtu.be/DWalxhYx7Vw)
+
 To intitialize the application, type 
 ~~~ 
 node server

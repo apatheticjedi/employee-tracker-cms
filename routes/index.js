@@ -3,7 +3,7 @@ const db = require('../db/connection');
 
 let roles = ['Sales Lead', 'Salesperson', 'Lead Engineer', 'Software Engineer', 'Account Manager', 'Accountant', 'Legal Team Lead', 'Lawyer'];
 let departments = ['Sales', 'Engineering', 'Finance', 'Legal'];
-let employees = ['Mark Hamill', 'Harrison Ford', 'Carrie Fisher', 'James Earl Jones', 'Anthony Daniels', 'Peter Cushing', 'Peter Mayhew', 'Alec Guinness']
+let employees = ['Mark Hamill', 'Harrison Ford', 'Carrie Fisher', 'James Earl Jones', 'Anthony Daniels', 'Peter Cushing', 'Peter Mayhew', 'Alec Guinness', 'null'];
 
 const introQuestion = [
     {
@@ -35,7 +35,7 @@ const employeeQuestions = [
         type: 'list',
         name: 'manager',
         message: "Who is the employee's manager?",
-        choices: employees
+        choices: employees,
     }
 ];
 
@@ -81,33 +81,32 @@ const employeeUpdate = [
     }
 ]
 
-// const getDepartments = () => {
-//     const sql = `SELECT dept_name FROM departments`;
-//     db.query(sql, (err, rows) => {
-//         console.log(rows);
-//     });
-// };
-
-// const getRoles = () => {
-//     db.query(
-//         `SELECT title FROM roles`,
-//         function (err, results, fields) {
-//         });
-// };
-
-const addRole = () => {
+const addRole = async () => {
     inquirer.prompt(roleQuestions)
-        .then(data => {
-            let role = data.role;
-            let salary = data.salary;
-            let dept = data.roleDept;
-            const sql = `INSERT INTO roles (title, salary, department_id) 
-            VALUES ('${role}', ${salary}, ${dept})`;
+        .then(answer => {
+            let role = answer.role;
+            let salary = answer.salary;
+            let dept = answer.roleDept;
+            let deptId;
+            if (dept === 'Sales') {
+                deptId = 1;
+            } else if (dept === 'Engineering') {
+                deptId = 2;
+            } else if (dept === 'Finance') {
+                deptId = 3;
+            } else if (dept === 'Legal') {
+                deptId = 4;
+            } else {
+                deptId = 5;
+            };
+            const sql = `INSERT INTO roles (title, salary, department_id) VALUES ('${role}', ${salary}, ${deptId})`;
             db.query(sql, (err, rows) => {
+                console.log('Role added.');
                 startApp();
             });
         });
 };
+
 
 const addDept = () => {
     inquirer.prompt(departmentQuestion)
@@ -125,15 +124,38 @@ const addDept = () => {
         });
 };
 
-const addEmployee = () => {
+const addEmployee = async () => {
     inquirer.prompt(employeeQuestions)
         .then(data => {
             let firstName = data.firstName;
             let lastName = data.lastName;
+            let role = data.employeeRole;
+            let roleId;
+            if (role === 'Sales Lead') {
+                roleId = 1;
+            } else if (role === 'Salesperson') {
+                roleId = 2;
+            } else if (role === 'Lead Engineer') {
+                roleId = 3;
+            } else if (role === 'Software Engineer') {
+                roleId = 4;
+            } else if (role === 'Account Manager') {
+                roleId = 5;
+            } else if (role === 'Accountant') {
+                roleId = 6;
+            } else if (role === 'Legal Team Lead') {
+                roleId = 7;
+            } else if (role === 'Lawyer') {
+                roleId = 8;
+            } else {
+                roleId = 9;
+            };
             const sql = `INSERT INTO employees (first_name, last_name, role_id, manager_id)
-            VALUES ('${firstName}', '${lastName}', '')`
-            console.table(employeeRole());
-
+            VALUES ('${firstName}', '${lastName}', ${roleId}, 1)`;
+            db.query(sql, (err, rows) => {
+                console.log('Employee added.');
+                startApp();
+            });
         });
 };
 
